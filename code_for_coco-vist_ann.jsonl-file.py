@@ -24,6 +24,15 @@ def get_vocab(vocabtxt):
         vlists = set(vlist)
     return vlists
 
+img_ids_file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/sentence_ids_final").readlines()
+
+def read_file(file):
+    texts=[]
+    for word in file:
+        text=word.rstrip('\n')
+        texts.append(text)
+    return texts
+
 def get_indexes(idxtxt):
     idlist = []
     with open(idxtxt, 'r') as indexes:
@@ -42,6 +51,7 @@ def get_indexes(idxtxt):
             fullidx = mykey+image
             idlist.append(fullidx)
     return idlist
+
 
 
 def read_sentences(pklfile,sent_idx_list,img_idx_list,save_path):
@@ -86,6 +96,13 @@ def read_file(file):
 
 ###MY ADJUSTED GET_INDEXES FUNCTION###
 
+img_ids_file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/sentence_ids_final").readlines()
+
+print(type(img_ids_file))
+print(img_ids_file[0])
+print(len(img_ids_file))
+print(img_ids_file[1])
+
 def getting_indexes(idxtxt): #this is the adjusted function.
     idlist = []
     for idx in idxtxt:
@@ -102,11 +119,12 @@ def getting_indexes(idxtxt): #this is the adjusted function.
         fullidx = mykey+image
         idlist.append(fullidx)
     return idlist
-#
-# new_idx=getting_indexes(unique_ids_corrected)
-# print(new_idx)
-#
-# print(type(new_idx))
+
+
+#new_img_idx=getting_indexes(img_ids_file)
+
+#np.savetxt("final_img_indexes",new_img_idx,delimiter=",",fmt="%s")
+# print(len(img_idx))
 
 #np.savetxt("c_v_indexes.csv",new_idx,delimiter=",",fmt="%s")
 #
@@ -177,15 +195,57 @@ import untokenize
 
 
 #I WILL CONVERT MY TOTAL_SUBSET_SENTENCES FILE TO A PICKLE FILE
-file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/total_subset_sentences.txt").readlines()
+# file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/total_subset_sentences.txt").readlines()
+#
+#
+# sentences_corrected=read_file(file)
+#
+# #pickling :
+# print(type(sentences_corrected))
+#
+# import pickle
+#
+# with open("total_subset_sentences.pkl","wb") as sentencepickle:
+#     pickle.dump(sentences_corrected,sentencepickle)
 
 
-sentences_corrected=read_file(file)
 
-#pickling :
-print(type(sentences_corrected))
 
-import pickle
+def read_sentences(pklfile,sent_idx_list,img_idx_list,save_path):
+    data = pickle.load(open(pklfile, 'rb'))
+    # freq_list = []
+    with jsonlines.open(save_path, mode='w') as writer:
+        for elem, s in tqdm(list(enumerate(data))):
+            sentences = []
+            if sent_idx_list[elem] in img_idx_list:
+                # save the datapoint
+                # with jsonlines.open(save_path, mode='w') as writer:
+                # sentences = []
+                sentences.append(s.strip()[1:-1]) # to get rid of double quotes
+                img_id = str(sent_idx_list[elem])
+                name = str(img_id.split('_')[1])
+                d = {'sentences': sentences, 'id': img_id, 'img_path': img_id} # TODO: was img_path: name
+                # print(d)
+                writer.write(d)
+                # we can also compute stats on frequency of words
 
-with open("total_subset_sentences.pkl","wb") as sentencepickle:
-    pickle.dump(sentences_corrected,sentencepickle)
+pkl_file=pickle.load(open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/dataa1.pkl","rb"))
+pkl_file_str=str(pkl_file) #this is because I got an error that str or bytes etc.. are expected but list is given.
+
+print(len(pkl_file))
+sent_ids_file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/sentence_ids_final").readlines()
+img_ids_file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/final_img_indexes").readlines()
+save_path_file=("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/coco_vist_json_file")
+sent_texts_file=open("/Users/ilkeasal/Desktop/Important_files_for_my_Internship/New_sentences_and_ids/Newly_created_files/Last_modifications/sentence_texts_final")
+
+
+#read_sentences(pkl_file,sent_ids_file,img_ids_file,save_path_file)
+read_sentences(pkl_file_str,sent_ids_file,img_ids_file,save_path_file)
+
+
+
+
+
+
+
+
